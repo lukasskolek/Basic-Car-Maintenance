@@ -31,20 +31,24 @@ struct DashboardView: View {
         NavigationStack {
             List {
                 ForEach(viewModel.searchedEvents) { event in
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(event.title)
                             .font(.title3)
+                            .fontWeight(.bold)
+                        
+                        Text(event.date, formatter: self.eventDateFormat)
+                            .foregroundStyle(.secondary)
                         
                         let vehicleName = viewModel.vehicles.first { $0.id == event.vehicleID }?.name
                         if let vehicleName {
-                            Text("\(vehicleName) on \(event.date, formatter: self.eventDateFormat)",
-                                 comment: "Maintenance list item for a vehicle on a date")
+                            Text("For: \(vehicleName)", comment: "the vehcile name is filled in here")
+                                .foregroundStyle(.secondary)
                         }
                         
                         if !event.notes.isEmpty {
-                            Text(event.notes)
-                                .lineLimit(0)
+                            Text("Notes:")
                                 .foregroundStyle(.secondary)
+                            Text(event.notes)
                         }
                     }
                     .accessibilityElement(children: .combine)
