@@ -17,6 +17,9 @@ struct SettingsView: View {
    
     @ScaledMetric(relativeTo: .largeTitle) var iconDimension = 20.0
     
+    // swiftlint:disable:next line_length
+    @AppStorage(AppStorageKeys.measurementSystem) private var defaultUnitSystem: MeasurementSystem = .userDefault
+    
     @State private var viewModel: SettingsViewModel
     @State private var isShowingAddVehicle = false
     @State private var showDeleteVehicleError = false
@@ -161,6 +164,18 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("Vehicles", comment: "Label to display header title.")
+                }
+                
+                Section {
+                    Picker("Preferred System", selection: $defaultUnitSystem) { 
+                        ForEach(MeasurementSystem.allCases) { unit in
+                            Text(unit.title)
+                                .tag(unit)
+                        }
+                    }
+                    .foregroundStyle(.blue)
+                } header: {
+                    Text("Units", comment: "Label to represent the options for measurement units")
                 }
                 
                 Section {
