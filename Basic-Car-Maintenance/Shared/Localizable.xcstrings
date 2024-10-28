@@ -5506,6 +5506,9 @@
         }
       }
     },
+    "Vehicle Details" : {
+      "comment" : "Label about vehicle details."
+    },
     "Vehicle License Plate Number" : {
       "localizations" : {
         "be" : {

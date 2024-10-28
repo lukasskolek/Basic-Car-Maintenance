@@ -1,5 +1,5 @@
 //
-//  EditVehicleView.swift
+//  VehicleDetailView.swift
 //  Basic-Car-Maintenance
 //
 //  https://github.com/mikaelacaron/Basic-Car-Maintenance
@@ -8,14 +8,10 @@
 
 import SwiftUI
 
-struct EditVehicleView: View, Observable {
+struct VehicleDetailView: View {
+    
     @Binding var selectedVehicle: Vehicle?
     var viewModel: SettingsViewModel
-    
-    /// closure to update the values passed in, and set them to all the state properties
-    var onVehicleUpdated: ((Vehicle) -> Void)?
-    
-    @Environment(\.dismiss) var dismiss
     
     @State private var name = ""
     @State private var make = ""
@@ -25,49 +21,49 @@ struct EditVehicleView: View, Observable {
     @State private var VIN = ""
     @State private var licensePlateNumber = ""
     
-    private var isVehicleValid: Bool {
-        !name.isEmpty && !make.isEmpty && !model.isEmpty
-    }
+    @State private var isShowingEditVehicleView = false
     
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Name", text: $name)
+                    Text(name)
                 } header: {
                     Text("Name")
                 }
                 
                 Section {
-                    TextField("Make", text: $make)
+                    Text(make)
                 } header: {
                     Text("Make")
                 }
                 
                 Section {
-                    TextField("Model", text: $model)
+                    Text(model)
                 } header: {
                     Text("Model")
                 }
                 
                 Section {
-                    TextField("Year", text: $year)
+                    Text(year)
                 } header: {
                     Text("Year")
                 }
                 
                 Section {
-                    TextField("Color", text: $color)
+                    Text(color)
                 } header: {
                     Text("Color")
                 }
+                
                 Section {
-                    TextField("VIN", text: $VIN)
+                    Text(VIN)
                 } header: {
                     Text("VIN")
                 }
+                
                 Section {
-                    TextField("License Plate Number", text: $licensePlateNumber)
+                    Text(licensePlateNumber)
                 } header: {
                     Text("License Plate Number")
                 }
@@ -75,48 +71,29 @@ struct EditVehicleView: View, Observable {
             .analyticsView("\(Self.self)")
             .onAppear {
                 guard let selectedVehicle else { return }
-                setEditVehicleValues(selectedVehicle)
+                setVehicleValues(selectedVehicle)
             }
-            .navigationTitle("Update Vehicle Info")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem {
                     Button {
-                        dismiss()
+                        isShowingEditVehicleView.toggle()
                     } label: {
-                        Text("Cancel")
+                        Text("Edit")
                     }
                 }
-                
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        if let selectedVehicle {
-                            var vehicle = Vehicle(
-                                name: name,
-                                make: make,
-                                model: model,
-                                year: year,
-                                color: color,
-                                vin: VIN,
-                                licensePlateNumber: licensePlateNumber)
-                            vehicle.id = selectedVehicle.id
-                            Task {
-                                await viewModel.updateVehicle(vehicle)
-                                if let onVehicleUpdated {
-                                    onVehicleUpdated(vehicle)
-                                }
-                                dismiss()
-                            }
-                        }
-                    } label: {
-                        Text("Update")
-                    }
-                    .disabled(!isVehicleValid)
-                }
+            }
+            .navigationTitle(Text("Vehicle Details", comment: "Label about vehicle details."))
+            .sheet(isPresented: $isShowingEditVehicleView) {
+                EditVehicleView(
+                    selectedVehicle: $selectedVehicle, 
+                    viewModel: viewModel, 
+                    onVehicleUpdated: setVehicleValues
+                )
             }
         }
     }
     
-    func setEditVehicleValues(_ vehicle: Vehicle) {
+    private func setVehicleValues(_ vehicle: Vehicle) {
         self.name = vehicle.name
         self.make = vehicle.make
         self.model = vehicle.model
@@ -128,7 +105,6 @@ struct EditVehicleView: View, Observable {
 }
 
 #Preview {
-    
     @Previewable @State var selectedVehicle: Vehicle? = Vehicle(
         id: UUID().uuidString,
         name: "My Car",
@@ -140,7 +116,6 @@ struct EditVehicleView: View, Observable {
         licensePlateNumber: "ABC123"
     )
     var viewModel = SettingsViewModel(authenticationViewModel: AuthenticationViewModel())
-
-    EditVehicleView(selectedVehicle: $selectedVehicle, viewModel: viewModel)
     
+    VehicleDetailView(selectedVehicle: $selectedVehicle, viewModel: viewModel)
 }
