@@ -139,7 +139,7 @@ struct EditVehicleView: View, Observable {
         vin: "5YJSA1E26JF123456",
         licensePlateNumber: "ABC123"
     )
-    var viewModel = SettingsViewModel(authenticationViewModel: AuthenticationViewModel())
+    let viewModel = SettingsViewModel(authenticationViewModel: AuthenticationViewModel())
 
     EditVehicleView(selectedVehicle: $selectedVehicle, viewModel: viewModel)
     

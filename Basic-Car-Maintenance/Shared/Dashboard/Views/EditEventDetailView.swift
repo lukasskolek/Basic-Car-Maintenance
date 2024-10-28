@@ -100,7 +100,7 @@ struct EditMaintenanceEventView: View {
         notes: "Changed engine oil"
     )
     
-    var viewModel = DashboardViewModel(userUID: "user123")
+    let viewModel = DashboardViewModel(userUID: "user123")
     
     EditMaintenanceEventView(
         selectedEvent: $selectedEvent,
