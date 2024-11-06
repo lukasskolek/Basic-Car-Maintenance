@@ -14,7 +14,7 @@ class MainTabViewModel {
     @MainActor var alert: AlertItem?
     
     /// Update the UI once a new alert is sent
-    func fetchNewestAlert(ignoring acknowledgedAlerts: [String]) {
+    func fetchNewestAlert(ignoring acknowledgedAlerts: [String]) async {
         
         var query = Firestore
             .firestore()
@@ -27,14 +27,10 @@ class MainTabViewModel {
                 .whereField(FirestoreField.id, notIn: acknowledgedAlerts)
         }
         
-        query.getDocuments { [weak self] snapshot, error in
-            guard let self,
-                  error == nil,
-                  let documents = snapshot?.documents else {
-                return
-            }
+        do {
+          let snapshot = try await query.getDocuments()
             
-            let newAlert = documents
+            let newAlert = snapshot.documents
                 .compactMap {
                     do {
                         return try $0.data(as: AlertItem.self)
@@ -50,6 +46,9 @@ class MainTabViewModel {
                     self.alert = newAlert
                 }
             }
+
+        } catch {
+          print("Error getting documents: \(error)")
         }
     }
 }

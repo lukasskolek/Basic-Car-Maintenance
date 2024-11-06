@@ -93,7 +93,9 @@ struct MainTabView: View {
             }
         }
         .onAppear {
-            viewModel.fetchNewestAlert(ignoring: acknowledgedAlerts.map(\.id))
+            Task { @MainActor in
+                 await viewModel.fetchNewestAlert(ignoring: acknowledgedAlerts.map(\.id))
+             }
         }
         .onChange(of: viewModel.alert) { _, newValue in
             guard let id = newValue?.id else { return }
