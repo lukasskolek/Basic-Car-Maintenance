@@ -218,6 +218,8 @@ enum TimeRange: String, CaseIterable, Identifiable {
     let eighthReading = createReading(vehicleID: secondCar.id!,
                                      date: "2024/11/13",
                                      distance: 1542)
+    
+    // swiftlint:disable:next line_length
     viewModel.readings.append(contentsOf: [firstReading, secondReading, thirdReading, fourthReading, fifthReading, sixthReading, seventhReading, eighthReading])
     
     return OdometerView(viewModel: viewModel)
