@@ -13,7 +13,7 @@ struct OdometerView: View {
     @Environment(ActionService.self) var actionService
     
     @State private var viewModel: OdometerViewModel
-    @State private var selectedTimeRange: TimeRange = .years
+    @State private var selectedTimeRange: TimeRange = .all
     
     init(userUID: String?) {
         self.init(viewModel: OdometerViewModel(userUID: userUID))
@@ -127,12 +127,14 @@ struct OdometerView: View {
         .analyticsView("\(Self.self)")
     }
     
-    // Helper function to filter readings based on the selected time range
+    /// Filter the readins based on the selected time range, and if there are no readings in the last 30 days, just show the last reading.
+    /// - Parameter vehicle: The vehicle for these readings.
+    /// - Returns: The `[OdometerReading]`s for this vehicle in the time range.
     private func filteredReadings(for vehicle: Vehicle) -> [OdometerReading] {
         let vehicleReadings = viewModel.readings.filter { $0.vehicleID == vehicle.id }
         
         switch selectedTimeRange {
-        case .years:
+        case .all:
             return vehicleReadings
         case .last30Days:
             guard let lastReadingDate = vehicleReadings.map({ $0.date }).max() else {
@@ -148,7 +150,6 @@ struct OdometerView: View {
                     return []
                 }
             } else {
-                // Include readings from the last 30 days
                 return vehicleReadings.filter { $0.date >= thirtyDaysAgo }
             }
         }
@@ -175,9 +176,9 @@ struct OdometerView: View {
     }
 }
 
-// Enum for the time range options in the picker
+/// The time range options in the picker for the graph.
 enum TimeRange: String, CaseIterable, Identifiable {
-    case years = "All readings"
+    case all = "All readings"
     case last30Days = "Latest readings"
     
     var id: String { self.rawValue }
@@ -185,7 +186,7 @@ enum TimeRange: String, CaseIterable, Identifiable {
 
 #Preview {
     let viewModel = OdometerViewModel(userUID: nil)
-    let firstCar = createVehicle(id: "id1", name: "1st car")
+    let firstCar = createVehicle(id: "id1", name: "My 1st car")
     let secondCar = createVehicle(id: "id2", name: "2nd Car")
     
     viewModel.vehicles.append(contentsOf: [firstCar, secondCar])
